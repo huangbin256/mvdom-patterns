@@ -13,11 +13,14 @@ Used right, the DOM does not need much to become a strong foundation for scalabl
 
 ## Install & Run
 
+Requirement: node.js >6.x, gulp
+
 ```
 git clone git@github.com:mvdom/mvdom-patterns.git
 
 cd mvdom-patterns
 npm install
+gulp
 npm start
 ```
 
