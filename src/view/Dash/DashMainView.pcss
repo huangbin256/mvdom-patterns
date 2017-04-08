@@ -62,12 +62,30 @@
 	/* --------- ui-table customization --------- */
 	.ui-table{
 
+		.ui-tr.changed-up{
+			& .cpu, & .mem{
+				color: green	
+			}			
+		}
+
+		.ui-tr.changed-down{
+			& .cpu, & .mem{
+				color: red	
+			}			
+		}		
+
+		.ui-tr.changed-new{
+			& .cpu, & .mem{
+				color: blue	
+			}			
+		}			
 		/* Customize the header cell and body cells column by class name 
 		   (since they have matching class name) */
 		.pid{
 			flex: none;
 			width: 64px;
 		}
+
 	}	
 	/* --------- /ui-table customization --------- */
 

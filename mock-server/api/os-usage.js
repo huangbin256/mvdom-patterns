@@ -12,7 +12,7 @@ module.exports = routes;
 // --------- Data Capture --------- //
 var usageLimit = 10;
 
-var cpuMonitor = new usage.CpuMonitor();
+var cpuMonitor = new usage.CpuMonitor({limit:30});
 
 var cpuUsageData = [];
 var topCpuProcs;
@@ -29,14 +29,20 @@ cpuMonitor.on('topCpuProcs', function(data) {
 
 
 var memUsageData = [];
+var topMemProcs;
 
-var memMonitor = new usage.MemMonitor();
+var memMonitor = new usage.MemMonitor({limit:30});
+
 // watch memory usage overview 
 memMonitor.on('memUsage', function(data) {
 	// { used: '9377M', wired: '2442M', unused: '7005M' } 
 	_addData(memUsageData, data);
 });
 
+memMonitor.on("topMemProcs", function(data){
+	// [ { pid: '0', mem: '1521M', command: 'kernel_task' }
+	topMemProcs = data;
+});
 
 // private function that add an new data item to its list, add time, max the list at usageLimit 
 function _addData(list, data){
@@ -52,45 +58,48 @@ function _addData(list, data){
 
 // --------- /Data Capture --------- //
 
-// --------- Route APIs --------- //
+// --------- Usage APIs --------- //
 routes.push({
 	method: 'GET',
 	path: baseURI + "/cpuUsage", 
 	handler: {
-		async: apiCpuUsage
+		async: function(request, reply){
+			reply(cpuUsageData);
+		}
 	}
 });
-
-function apiCpuUsage(request, reply){
-	reply(cpuUsageData);
-}
-
-
 
 routes.push({
 	method: 'GET',
 	path: baseURI + "/topCpuProcs", 
 	handler: {
-		async: apiTopCpuProcs
+		async: function(request, reply){
+			//[ { pid: '21749', cpu: '0.0', command: 'top' },
+			reply(topCpuProcs);
+		}
 	}
 });
-
-function apiTopCpuProcs(request, reply){
-	//[ { pid: '21749', cpu: '0.0', command: 'top' },
-	reply(topCpuProcs);
-}
 
 
 routes.push({
 	method: 'GET',
 	path: baseURI + "/memUsage", 
 	handler: {
-		async: apiMemUsage
+		async: function(request, reply){
+			reply(memUsageData);
+		}
 	}
 });
 
-function apiMemUsage(request, reply){
-	reply(memUsageData);
-}
 
-// --------- /Route APIs --------- //
+
+routes.push({
+	method: 'GET',
+	path: baseURI + "/topMemProcs", 
+	handler: {
+		async: function(request, reply){
+			reply(topMemProcs);
+		}
+	}
+});
+// --------- /Usage APIs --------- //

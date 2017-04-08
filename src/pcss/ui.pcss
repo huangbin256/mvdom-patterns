@@ -35,6 +35,7 @@
 	flex-direction: column;
 	
 
+	/* The header row of the table */
 	.ui-thead{
 		display: flex;
 		flex-direction: row;
@@ -53,21 +54,38 @@
 		}
 	}
 
+	/* The body container of the table */
 	.ui-tbody{
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		border-bottom: solid 1px $bdr-lightest;
-			
+		overflow: scroll;
+		
+		/* placeholder div when the table is loading content */
+		.ui-tholder{
+			flex: 1;
+			align-items: center;
+			display: flex;
+			justify-content: center;
+			font-size: 32px;
+			color: $txt-light;
+			font-weight: 100;
+			letter-spacing: .1em;
+		}
+
+
+		/* the table row. Each direct element is considered to be a cell. */
 		.ui-tr{			
 			display: flex;
 			flex-direction: row;
 			border-bottom: solid 1px $bdr-lighter;
-			height: 32px;
+			min-height: 32px;
 			align-items: center;
 			> *{
 				padding-left: 8px;
 				flex: 1;
+				overflow: hidden;
 			}
 		}		
 	}

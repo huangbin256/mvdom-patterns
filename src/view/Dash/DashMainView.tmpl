@@ -1,7 +1,8 @@
+<script id="DashMainView" type="text/html">
 <div class="DashMainView">
 
 	<div class="column">
-		<div class="ui-card summary cpu-card">
+		<div class="ui-card cpu-card summary">
 			<header>CPU</header>
 			<section class="content">
 				<div class="metric">
@@ -16,25 +17,22 @@
 			</section>
 		</div>
 
-		<div class="ui-card details">
+		<div class="ui-card cpu-card details">
 
-			<header>Top CPU Procs</header>
+			<header>Top CPU Processes</header>
 
 			<section class="content">
 				<div class="ui-table">
 					<div class="ui-thead">
 						<div class="name">Name</div>
 						<div class="pid">PID</div>
-						<div class="mem">Cpu</div>
+						<div class="cpu">Cpu</div>
 					</div>
 
 					<div class="ui-tbody">
-						<div class="ui-tr">
-							<div class="name">Not implemented yet</div>
-							<div class="pid">...</div>
-							<div class="mem">...</div>						
-						</div>
+						<div class="ui-tholder">LOADING....</div>						
 					</div>
+									
 				</div>			
 			</section>
 		</div>	
@@ -42,7 +40,7 @@
 
 
 	<div class="column">
-		<div class="ui-card summary mem-card">
+		<div class="ui-card mem-card summary">
 			<header>Memory</header>
 			<section class="content">
 				<div class="metric">
@@ -57,8 +55,8 @@
 			</section>
 		</div>
 
-		<div class="ui-card details">
-			<header>Memory Usage</header>
+		<div class="ui-card mem-card details">
+			<header>Top Memory Processes</header>
 
 			<section class="content">
 				<div class="ui-table">
@@ -69,11 +67,7 @@
 					</div>
 
 					<div class="ui-tbody">
-						<div class="ui-tr">
-							<div class="name">Not implemented yet</div>
-							<div class="pid">...</div>
-							<div class="mem">...</div>
-						</div>
+						<div class="ui-tholder">LOADING....</div>				
 					</div>
 
 				</div>			
@@ -83,3 +77,24 @@
 
 
 </div>
+</script>
+
+<script id="DashMainView-mem-trs" type="text/html">
+{{#each items}}
+<div class="ui-tr {{changed}}">
+	<div class="name">{{command}}</div>
+	<div class="pid">{{pid}}</div>
+	<div class="mem">{{mem}}</div>
+</div>
+{{/each}}
+</script>
+
+<script id="DashMainView-cpu-trs" type="text/html">
+{{#each items}}
+<div class="ui-tr {{changed}}">
+	<div class="name">{{command}}</div>
+	<div class="pid">{{pid}}</div>
+	<div class="cpu">{{cpu}}</div>
+</div>
+{{/each}}
+</script>

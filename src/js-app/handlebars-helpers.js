@@ -1,4 +1,4 @@
 
-Handlebars.registerHelper('echo', function (cond, val) {
+Handlebars.registerHelper("echo", function (cond, val) {
 	return (cond)?val:"";
 });
