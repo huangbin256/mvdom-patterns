@@ -1,7 +1,5 @@
-var d = mvdom; // external lib
-var ajax = require("./ajax.js");
 
-// The `ds` module is the DataService module which is the layer to access data. The pattern here is that, 
+// The 'ds' module is the DataService module which is the layer to access data. The pattern here is that, 
 // the first param is the object type, which allows to have a single access points to data and start with dynamic/generic
 // CRUD behavior and customize as needed behind the scene.
 
@@ -9,56 +7,48 @@ var ajax = require("./ajax.js");
 // cond: {"title": "exactmatch", "firstName;ilike":"%jen%", "age;>": 30}
 // orderBy: "lastName" or "!age" (age descending) or ["!age", "lastName"]
 
+// ds("Task").create()
+
+// ds.register("_fallback_",{create, update, remove, ...})
+// ds.register("Task",)
+
+// dso by name
+var dsoDic = {};
+
+// optional dso fallback factory
+var _dsoFallbackFn;
+
 
 module.exports = {
-	get: get,
-	first: first,
-	list: list, 
-	create: create,
-	update: update, 
-	remove: remove, 
-	on: on, 
-	off: off,
-}; 
+	dso: dsoFn,
+	register: register,
+	fallback: fallback
+};
 
-var dsHub = d.hub("dsHub");
 
-function get(type, id){
-	return new Promise(function(r,f){
-		r({id:id,name:"demo"});
-	});
-}
+// return a DSO for a given type
+function dsoFn(type){
+	var dso = dsoDic[type];
 
-function first(type, filter){
-	dsHub.trigger(type, "first", {type: type, labels: "first", });
-}
+	// if no dso found, but we have a dsoFallback factory, then, we create it.
+	if (!dso && _dsoFallbackFn){
+		dsoDic[type] = dso = _dsoFallbackFn(type);
+	}
 
-function list(type, filter){
+	// throw exception if still no dso
+	if (!dso){
+		throw new "No dso for type " + type;
+	}
+
+	return dso;
 
 }
 
-function update(){
-
+// register a dso for a given type
+function register(type, dso){
+	dsoDic[type] = dso;
 }
 
-function remove(){
-
-}
-
-function create(type, entity){
-	return new Promise(function(r,f){
-		r({id:id,name:"demo"});
-	}).then(function(){
-		dsHub.trigger(type, "create", {info: entity, id: id});
-	});
-}
-
-// e.g., on("Task", "create, delete, update", ...)
-function on(type, selector, fun, opts){
-	dsHub.on(type, selector, fun, opts);
-}
-
-
-function off(ns){
-	dsHub.off({ns:ns});
+function fallback(dsoFallbackFn){
+	_dsoFallbackFn = dsoFallbackFn;
 }
