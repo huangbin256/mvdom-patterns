@@ -54,8 +54,9 @@ d.register("DashMainView",{
 					return; // do nothing, next cycle we might have the data
 				}
 				var lastMeasure = data[data.length - 1];
-				lastMeasure.usedInGb = lastMeasure.used / 1000;
-				d.push(d.first(view.el, ".mem-card.summary"), lastMeasure);					
+				console.log(formatMb(lastMeasure.used));
+				d.push(d.first(view.el, ".mem-card.summary"), {used: formatMb(lastMeasure.used),
+					unused: formatMb(lastMeasure.unused)});					
 			}
 		}, 
 
@@ -136,6 +137,20 @@ d.register("DashMainView",{
 
 
 // --------- Statics --------- //
+
+// format a megabyte number as optimially as possible
+function formatMb(num){
+	var val = "" + num;
+	var unit = "M";
+	if (num > 900){
+		val = (num / 1000).toFixed(2);
+		unit = "Gb";
+	}
+	val = val.replace(".00","");
+	val = val + unit;
+	return val;	
+}
+
 // Mark the items if their value changed compared to the previous store
 function markChanges(prevDic, items, keyName, valName){
 
