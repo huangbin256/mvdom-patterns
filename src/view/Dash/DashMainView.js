@@ -140,7 +140,7 @@ d.register("DashMainView",{
 
 // format a megabyte number as optimially as possible
 function formatMb(num){
-	var val = "" + num;
+	var val = "" + num.toFixed(2);
 	var unit = "M";
 	if (num > 900){
 		val = (num / 1000).toFixed(2);
