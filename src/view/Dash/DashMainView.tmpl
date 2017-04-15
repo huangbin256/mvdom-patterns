@@ -44,13 +44,13 @@
 			<header>Memory</header>
 			<section class="content">
 				<div class="metric">
-					<div class="data"><span class="dx dx-used">...</span></div>
+					<div class="data"><span class="dx dx-usedInGb">...</span>Gb</div>
 					<label>USED</label>
 				</div>
 
 				<div class="metric">
-					<div class="data"><span class="dx dx-wired">...</span></div>
-					<label>WIRED</label>
+					<div class="data"><span class="dx dx-unused">...</span>M</div>
+					<label>UNUSED</label>
 				</div>					
 			</section>
 		</div>
@@ -82,7 +82,7 @@
 <script id="DashMainView-mem-trs" type="text/html">
 {{#each items}}
 <div class="ui-tr {{changed}}">
-	<div class="name">{{command}}</div>
+	<div class="name">{{name}}</div>
 	<div class="pid">{{pid}}</div>
 	<div class="mem">{{mem}}</div>
 </div>
@@ -92,7 +92,7 @@
 <script id="DashMainView-cpu-trs" type="text/html">
 {{#each items}}
 <div class="ui-tr {{changed}}">
-	<div class="name">{{command}}</div>
+	<div class="name">{{name}}</div>
 	<div class="pid">{{pid}}</div>
 	<div class="cpu">{{cpu}}</div>
 </div>

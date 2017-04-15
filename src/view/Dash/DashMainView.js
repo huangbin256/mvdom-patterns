@@ -23,8 +23,11 @@ d.register("DashMainView",{
 				return ajax.get("/api/cpuUsage");
 			}, 
 			receiveFn: function(data){
+				if (data.length === 0){
+					return; // do nothing, next cycle we might have the data
+				}				
 				var lastMeasure = data[data.length - 1];
-				d.push(d.first(view.el, ".cpu-card"), lastMeasure);				
+				d.push(d.first(view.el, ".cpu-card.summary"), lastMeasure);				
 			}
 		});		
 	},
@@ -47,8 +50,12 @@ d.register("DashMainView",{
 
 			receiveFn: function(data){
 				var view = this; // the performFn and receiveFn are added to the scheduler.js with this view instance as ctx (context)
+				if (data.length === 0){
+					return; // do nothing, next cycle we might have the data
+				}
 				var lastMeasure = data[data.length - 1];
-				d.push(d.first(view.el, ".mem-card"), lastMeasure);					
+				lastMeasure.usedInGb = lastMeasure.used / 1000;
+				d.push(d.first(view.el, ".mem-card.summary"), lastMeasure);					
 			}
 		}, 
 
@@ -63,6 +70,10 @@ d.register("DashMainView",{
 				var items = data;
 				var tbodyEl = d.first(view.el, ".mem-card .ui-tbody");
 
+				// do nothing if empty data (still building it up on the server)
+				if (items && items.length === 0){
+					return;
+				}
 
 				// mark the items changed if they did
 				markChanges(view.prevTopMemProcsDic, items, "pid", "mem");
@@ -71,7 +82,7 @@ d.register("DashMainView",{
 				view.prevTopMemProcsDic = utils.dic(items, "pid");
 
 				// sort by name
-				sortBy(items, "command");
+				sortBy(items, "mem", "name");
 
 				var html = render("DashMainView-mem-trs", {items: data});
 
@@ -95,6 +106,11 @@ d.register("DashMainView",{
 				var items = data;
 				var tbodyEl = d.first(view.el, ".cpu-card .ui-tbody");
 
+				// do nothing if empty data (still building it up on the server)
+				if (items && items.length === 0){
+					return;
+				}
+
 
 				// mark the items changed if they did
 				markChanges(view.prevTopCpuProcsDic, items, "pid", "cpu");
@@ -103,7 +119,7 @@ d.register("DashMainView",{
 				view.prevTopCpuProcsDic = utils.dic(items, "pid");
 
 				// sort by name
-				sortBy(items, "command");				
+				sortBy(items, "cpu", "name");				
 
 				// render and update the HTML table
 				var html = render("DashMainView-cpu-trs", {items: items});
@@ -135,8 +151,8 @@ function markChanges(prevDic, items, keyName, valName){
 			}
 			// if we have a previous item, we compare the value to mark if it went up or down
 			else{
-				var val = asNum(item[valName]);
-				var prevVal = asNum(prevItem[valName]);				
+				var val = item[valName];
+				var prevVal = prevItem[valName];				
 				if (val != prevVal){
 					item.changed = (val > prevVal)?"changed-up":"changed-down";
 				}
@@ -166,9 +182,16 @@ function asNum(str){
 	
 }
 
-function sortBy(arr, key){
-	arr.sort(function(a, b){ 
-		return (a[key].toLowerCase() > b[key].toLowerCase())?1:-1;}
-	);		
+function sortBy(arr, keyNum, keyName){
+	arr.sort(function(a, b){
+		var anum = a[keyNum];
+		var bnum = b[keyNum];
+		// if they have the name num value, then, we compare the name
+		if (anum === bnum){
+			return (a[keyName].toLowerCase() > b[keyName].toLowerCase())?1:-1;
+		}else{
+			return (anum < bnum)?1:-1;
+		}		
+	});		
 }
 // --------- /Utils --------- //

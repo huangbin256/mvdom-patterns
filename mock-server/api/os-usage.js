@@ -1,4 +1,4 @@
-const usage = require("os-usage");
+const top = require("os-top");
 
 const routes = []; 
 
@@ -9,40 +9,59 @@ const baseURI = "/api";
 module.exports = routes;
 
 
+
 // --------- Data Capture --------- //
-var usageLimit = 10;
+var lastRequestedMs = null;
+var maxIdle = 3000; // time to stop the fetch if nobody is requesting the data
 
-var cpuMonitor = new usage.CpuMonitor({limit:30});
+var arrayLimit = 10;
+var delay = 1000; // delay in beteween top.fetch
 
-var cpuUsageData = [];
-var topCpuProcs;
+var cpuStats = [];
+var memStats = [];
+var procs = [];
 
-cpuMonitor.on('cpuUsage', function(data) {
-	// data:  { user: '9.33', sys: '56.0', idle: '34.66' }
-	_addData(cpuUsageData, data);
-});
-
-cpuMonitor.on('topCpuProcs', function(data) {
-	// data: [{ pid: '21670', cpu: '0.0', command: 'LookupViewServic' } ]
-	topCpuProcs = data;
-});
+var on = false;
 
 
-var memUsageData = [];
-var topMemProcs;
+// the lastRequestedMs scheme allow to run the expensive Top command every delay only if it is being requested.
+function touchLastRequested(){
+	lastRequestedMs = new Date().getTime();
 
-var memMonitor = new usage.MemMonitor({limit:30});
+	// if it was not running, we run it
+	if (!on){
+		on = true;
+		console.log("os-usage.js - starting top.fetch every " + (delay/1000) + "s");
+		topFetch();
+	}
 
-// watch memory usage overview 
-memMonitor.on('memUsage', function(data) {
-	// { used: '9377M', wired: '2442M', unused: '7005M' } 
-	_addData(memUsageData, data);
-});
+}
 
-memMonitor.on("topMemProcs", function(data){
-	// [ { pid: '0', mem: '1521M', command: 'kernel_task' }
-	topMemProcs = data;
-});
+function topFetch(){
+	var nowMs = new Date().getTime();
+
+	// if the lastRequested was > than maxIdel, then, we pause the loop
+	if (lastRequestedMs == null || (nowMs - lastRequestedMs) > maxIdle){
+		on = false;
+		console.log("os-usage.js - stopping topFetch");
+		return;
+	}
+
+	top.fetch().then(function(data){
+		_addData(cpuStats, data.stats.cpu);
+		_addData(memStats, data.stats.mem);
+		procs = data.procs;
+		// TODO: need to have the topCpuProcs and the topMemProcs
+
+		setTimeout(topFetch, delay);
+	}).catch(function(ex){
+		console.log("FAIL - top.fetch - " + ex);
+	});
+}
+
+
+
+
 
 // private function that add an new data item to its list, add time, max the list at usageLimit 
 function _addData(list, data){
@@ -51,7 +70,7 @@ function _addData(list, data){
 	data.time = nowMs;
 	list.push(data);
 
-	if (list.length > usageLimit){
+	if (list.length > arrayLimit){
 		list.splice(0,1);
 	}	
 }
@@ -64,7 +83,8 @@ routes.push({
 	path: baseURI + "/cpuUsage", 
 	handler: {
 		async: function(request, reply){
-			reply(cpuUsageData);
+			touchLastRequested();
+			reply(cpuStats);
 		}
 	}
 });
@@ -74,8 +94,8 @@ routes.push({
 	path: baseURI + "/topCpuProcs", 
 	handler: {
 		async: function(request, reply){
-			//[ { pid: '21749', cpu: '0.0', command: 'top' },
-			reply(topCpuProcs);
+			touchLastRequested();
+			reply(procs);
 		}
 	}
 });
@@ -86,7 +106,8 @@ routes.push({
 	path: baseURI + "/memUsage", 
 	handler: {
 		async: function(request, reply){
-			reply(memUsageData);
+			touchLastRequested();
+			reply(memStats);
 		}
 	}
 });
@@ -98,7 +119,8 @@ routes.push({
 	path: baseURI + "/topMemProcs", 
 	handler: {
 		async: function(request, reply){
-			reply(topMemProcs);
+			touchLastRequested();
+			reply(procs);
 		}
 	}
 });

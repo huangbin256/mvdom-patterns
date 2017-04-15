@@ -6,7 +6,7 @@
 	"dependencies": {
 		"mvdom": "*", 
 
-		"os-usage": "*"
+		"os-top": "*"
 
 	},
 	"devDependencies": {
