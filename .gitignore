@@ -1,8 +1,9 @@
 # Ignore mac info files
 .DS_Store
 
-# ignore node_modules
+# ignore node things
 node_modules/
+npm-debug.log
 
 # tmp/ might be used by the mock-server to store some data. 
 tmp/

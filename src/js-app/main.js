@@ -23,10 +23,6 @@ ds.fallback(function(type){
 	
 document.addEventListener("DOMContentLoaded", function(event) {
 
-
-
-
-
 	var bodyEl = d.first("body");
 
 	// first make sure we empty eventual body.

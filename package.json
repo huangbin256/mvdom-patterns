@@ -5,9 +5,7 @@
 	"main": "start.js",
 	"dependencies": {
 		"mvdom": "*", 
-
 		"os-top": "*"
-
 	},
 	"devDependencies": {
 		"async6": "*",
@@ -40,5 +38,5 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "node ./mock-server/start.js"
 	},
-	"author": ""
+	"author": "Jeremy Chone <jeremy.chone@gmail.com> (http://jeremychone.com)"
 }
