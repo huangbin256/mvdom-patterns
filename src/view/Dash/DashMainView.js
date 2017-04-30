@@ -54,7 +54,6 @@ d.register("DashMainView",{
 					return; // do nothing, next cycle we might have the data
 				}
 				var lastMeasure = data[data.length - 1];
-				console.log(formatMb(lastMeasure.used));
 				d.push(d.first(view.el, ".mem-card.summary"), {used: formatMb(lastMeasure.used),
 					unused: formatMb(lastMeasure.unused)});					
 			}

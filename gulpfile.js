@@ -11,7 +11,7 @@ var buffer = require('vinyl-buffer');
 
 var ext_replace = require('gulp-ext-replace');
 
-var hbsPrecompile = hbsp.precompile;
+var hbsPrecompile = hbsp.streamPrecompile;
 
 var webappDir = "";
 
@@ -50,7 +50,6 @@ gulp.task('watch', ['default'], function(){
 	gulp.watch(path.join(webappDir,"src/view/**/*.tmpl"), ['tmpl']);
 	gulp.watch(path.join(webappDir,"src/view/**/*.pcss"), ['pcss']);
 	gulp.watch(path.join(webappDir,"src/view/**/*.js"), ['app-bundle']);
-	//gulp.watch(path.join(webappDir,"src/view/*.tmpl"), ['app-bundle']);
 });
 
 
