@@ -2,8 +2,20 @@
 const path = require("path");
 const fs = require("fs-extra");
 
-module.exports = {removeFilesSync, listFilesSync};
+module.exports = {watch, removeFilesSync, listFilesSync, listDirsSync};
 
+
+function watch(dirs, end, fn){
+	var allDirs = listDirsSync(dirs);
+
+	allDirs.forEach(dir => {
+		fs.watch(dir, function(action, name){
+			if (name.endsWith(end)){
+				fn(action, name);
+			}
+		});
+	});	
+}
 
 // Clean the output files (.js or .css). 
 // - Will also clean the matching .map if exists.
@@ -50,4 +62,21 @@ function listFilesSync(dirs, ending, deep = true, fileList = []){
 	}
 
 	return fileList;
+}
+
+// build a flat dir list of those dirs and their sub dirs
+function listDirsSync(dirs, dirList = []){
+
+	// make it an array
+	dirs = (dirs instanceof Array)?dirs:[dirs];
+
+	// we add this dir list to 
+	Array.prototype.push.apply(dirList, dirs);
+
+	for (let dir of dirs){
+		let subDirs = fs.readdirSync(dir).filter(f => fs.statSync(path.join(dir, f)).isDirectory()).map(f => path.join(dir, f));
+		listDirsSync(subDirs, dirList);
+	}
+
+	return dirList;
 }

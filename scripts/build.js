@@ -1,5 +1,5 @@
 const router = require("cmdrouter");
-const promisify = require("async6").promisify;
+const async6 = require("async6");
 const browserify = require("browserify");
 const path = require("path");
 const fs = require("fs-extra");
@@ -9,8 +9,8 @@ const hbsPrecompile = require("hbsp").precompile; // promise style
 
 const utils = require("./utils.js");
 
-const readFile = promisify(fs.readFile, fs);
-const writeFile = promisify(fs.writeFile, fs);
+const readFile = async6.promisify(fs.readFile, fs);
+const writeFile = async6.promisify(fs.writeFile, fs);
 
 const processors = [
 	require("postcss-import"),
@@ -51,7 +51,6 @@ function* js(mode){
 		yield browserifyFiles(utils.listFilesSync(["src/js-app/","src/view/"], ".js"), 
 													path.join(webDir, "js/app-bundle.js"));
 	}
-
 }
 
 function* css(){
@@ -84,9 +83,26 @@ function* tmpl(){
 	writeFile(distFile,templateContent.join("\n"),"utf8");
 }
 
-function watch(){
 
+function* watch(){
+	// first we build all
+	yield _default();
 
+	utils.watch(["src/js-lib/"], ".js", (action, name) => {
+		async6.run(js("lib"));
+	});
+
+	utils.watch(["src/js-app/","src/view/"], ".js", (action, name) => {
+		async6.run(js("app"));
+	});	
+
+	utils.watch(["src/pcss/","src/view/"], ".css", (action, name) => {
+		async6.run(css());
+	});	
+
+	utils.watch(["src/view/"], ".tmpl", (action, name) => {
+		async6.run(tmpl());
+	});
 }
 // --------- /Command Functions --------- //
 

@@ -27,7 +27,6 @@ d.register("MainView",{
 });
 
 
-
 // --------- Private Methods --------- //
 
 function displayView(routeInfo){

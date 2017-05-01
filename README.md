@@ -11,7 +11,28 @@ Some simple but scalable DOM and Javascript Centric patterns to build scalable a
 
 Used right, the DOM does not need much to become a strong foundation for scalable application model. Here are some of those patterns using the mvDom DOM Centric micro-framework (< 12kb).
 
-## Install & Run
+## Install & Run (gulp-free)
+
+Note: We spent to some times to make this project gulp-free for simplicity sake. While gulp seems to reduce line of codes for build scripts, it also adds another layer of abstraction which is hard to follow sometime. Going back to the basics (pure node.js) really add clarity and future customization. (checkout the ./scripts/build.js to see the raw build). This is our preferred way from now on. 
+
+Requirement: node.js >6.x
+
+```
+git clone git@github.com:mvdom/mvdom-patterns.git
+
+cd mvdom-patterns
+npm install
+npm run build
+npm start
+```
+
+for live dev (in another terminal, same folder)
+```
+npm run build watch
+```
+
+
+## Install & Run (with gulp)
 
 Requirement: node.js >6.x, gulp
 
@@ -23,6 +44,12 @@ npm install
 gulp
 npm start
 ```
+
+for live dev (in another terminal, same folder)
+```
+gulp watch
+```
+
 
 
 ## What's in
