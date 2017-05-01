@@ -10,8 +10,7 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 
 var ext_replace = require('gulp-ext-replace');
-
-var hbsPrecompile = hbsp.streamPrecompile;
+var hbsPrecompile = hbsp.precompile;
 
 var webappDir = "";
 
