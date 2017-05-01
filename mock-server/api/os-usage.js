@@ -1,5 +1,9 @@
 const top = require("os-top");
-
+var cpuStat = require('cpu-stats');
+var memStat = require('mem-stat');
+var ps = require('current-processes');
+var os = require('os');
+ 
 const routes = []; 
 
 const baseURI = "/api";
@@ -47,16 +51,40 @@ function topFetch(){
 		return;
 	}
 
-	top.fetch().then(function(data){
-		_addData(cpuStats, data.stats.cpu);
-		_addData(memStats, data.stats.mem);
-		procs = data.procs;
-		// TODO: need to have the topCpuProcs and the topMemProcs
+	cpuStat(1000, function(error, cpuStatsResult) {
+		ps.get(function(err, processes) {
+			var cpuStatsData = {user: 0, sys: 0, idle: 0, time: null};
+			for(var i = 0; i < cpuStatsResult.length; i++){
+				cpuStatsData.user += cpuStatsResult[i].user;
+				cpuStatsData.sys += cpuStatsResult[i].sys;
+				cpuStatsData.idle += cpuStatsResult[i].idle;
+			}
+			cpuStatsData.user = Math.round(cpuStatsData.user / cpuStatsResult.length * 100) / 100;
+			cpuStatsData.sys = Math.round(cpuStatsData.sys / cpuStatsResult.length * 100) / 100;
+			cpuStatsData.idle = Math.round(cpuStatsData.idle / cpuStatsResult.length * 100) / 100;
+			_addData(cpuStats, cpuStatsData);
 
-		setTimeout(topFetch, delay);
-	}).catch(function(ex){
-		console.log("FAIL - top.fetch - " + ex);
+			var memStatsData = {used: os.totalmem() - os.freemem(), unused: os.freemem()};
+			memStatsData.used = memStatsData.used / 1024 / 1024;
+			memStatsData.unused = memStatsData.unused / 1024 / 1024;
+			_addData(memStats, memStatsData);
+			procs = processes;
+			// TODO: need to have the topCpuProcs and the topMemProcs
+
+			setTimeout(topFetch, delay);
+		});
 	});
+
+	// top.fetch().then(function(data){
+	// 	_addData(cpuStats, data.stats.cpu);
+	// 	_addData(memStats, data.stats.mem);
+	// 	procs = data.procs;
+	// 	// TODO: need to have the topCpuProcs and the topMemProcs
+
+	// 	setTimeout(topFetch, delay);
+	// }).catch(function(ex){
+	// 	console.log("FAIL - top.fetch - " + ex);
+	// });
 }
 
 
